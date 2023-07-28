@@ -11,6 +11,7 @@ import Firebase
 struct RegisterView: View {
     @State var email = ""
     @State var password = ""
+    @EnvironmentObject var viewModel: AuthViewModel
     
     var body: some View {
         NavigationStack {
@@ -31,16 +32,13 @@ struct RegisterView: View {
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding(.horizontal, 20)
                 
-                Button(action: { Register() }) {
+                Button(action: {
+                    Task {
+                        try await viewModel.createUser(withEmail: email, password: password)
+                    }
+                }) {
                     Text("Register")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.blue)
-                        .cornerRadius(10)
                 }
-                .padding(.horizontal, 20)
                 
                 
                 Spacer()

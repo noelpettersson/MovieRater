@@ -11,7 +11,8 @@ import Firebase
 struct LoginView: View {
     @State var email = ""
     @State var password = ""
-
+    @EnvironmentObject var viewModel: AuthViewModel
+    
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
@@ -31,7 +32,10 @@ struct LoginView: View {
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding(.horizontal, 20)
                 
-                Button(action: { login() }) {
+                Button(action: {
+                    Task {
+                        try await viewModel.signIn(withEmail: email, password: password) }
+                }) {
                     Text("Login")
                         .font(.headline)
                         .foregroundColor(.white)
@@ -46,7 +50,7 @@ struct LoginView: View {
                 Spacer()
                 
                 NavigationLink {
-                    LoginView()
+                    RegisterView()
                         .navigationBarBackButtonHidden(true)
                 } label: {
                     HStack(spacing: 3) {

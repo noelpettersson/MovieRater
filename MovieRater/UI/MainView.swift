@@ -9,20 +9,11 @@ import SwiftUI
 import Firebase
 
 struct MainView: View {
+    @EnvironmentObject var viewModel: AuthViewModel
     var body: some View {
-        Text(String(Auth.auth().currentUser!.uid))
         
-        Button(action: { SignOut() }) {
+        Button(action: { viewModel.signOut() }) {
             Text("Sign out")
-        }
-    }
-    
-    func SignOut() {
-        let firebaseAuth = Auth.auth()
-        do {
-          try firebaseAuth.signOut()
-        } catch let signOutError as NSError {
-          print("Error signing out: %@", signOutError)
         }
     }
 }

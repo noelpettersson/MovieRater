@@ -20,15 +20,13 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct MovieRaterApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    @StateObject var viewModel = AuthViewModel()
     
     var body: some Scene {
         WindowGroup {
             //If logged in go to MainView else go to LoginView
-            if(Auth.auth().currentUser != nil) {
-                MainView()
-            } else {
-                RegisterView()
-            }
+            ContentView()
+                .environmentObject(viewModel)
         }
     }
 }
