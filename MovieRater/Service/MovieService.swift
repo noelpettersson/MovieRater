@@ -9,12 +9,35 @@ class MovieService {
         }
         
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            
             if let data = data {
                 do {
                     let decoder = JSONDecoder()
                     let movieResponse = try decoder.decode(MovieResponse.self, from: data)
+                    
+                    // Print properties of each movie in the response
+                    movieResponse.results.forEach { movie in
+                        print("Movie ID: \(movie.id)")
+                        print("Movie Title: \(movie.title)")
+                        print("Movie Backdrop Path: \(movie.backdrop_path ?? "N/A")")
+                        print("Movie Poster Path: \(movie.poster_path ?? "N/A")")
+                        print("Movie Overview: \(movie.overview)")
+                        print("Movie Vote Average: \(movie.vote_average)")
+                        print("Movie Vote Count: \(movie.vote_count)")
+                        print("Movie Runtime: \(movie.runtime ?? 0)")
+                        print("Movie Release Date: \(movie.release_date ?? "N/A")")
+                        print("Movie Genre: \(movie.genre ?? "N/A")")
+                        print("Movie Origin Country: \(movie.origin_country ?? "N/A")")
+                        print("--------------------------")
+                    }
+                    
                     completion(.success(movieResponse))
                 } catch {
+                    print("Search Movie Error: \(error)")
                     completion(.failure(error))
                 }
             } else {
@@ -26,31 +49,6 @@ class MovieService {
         task.resume()
     }
     
-    func fetchMovieDetails(movieID: Int, completion: @escaping (Result<Movie, Error>) -> Void) {
-        guard let url = URL(string: "https://api.themoviedb.org/3/movie/\(movieID)?api_key=\(apiKey)") else {
-            return
-        }
-        
-        let task = URLSession.shared.dataTask(with: url) { data, response, error in
-            if let error = error {
-                completion(.failure(error))
-                return
-            }
-            
-            if let data = data {
-                do {
-                    let decoder = JSONDecoder()
-                    decoder.keyDecodingStrategy = .convertFromSnakeCase
-                    let movie = try decoder.decode(Movie.self, from: data)
-                    completion(.success(movie))
-                } catch {
-                    completion(.failure(error))
-                }
-            }
-        }
-        
-        task.resume()
-    }
     
     func fetchMovie() {
         // You can implement fetching specific movie details using the movie ID here

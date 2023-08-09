@@ -16,10 +16,10 @@ struct MovieTopRatedView: View {
             VStack {
                 Text("Top Rated Movies")
                 List(movies) { movie in
-                    NavigationLink(destination: MovieDetailView(movieID: movie.id)) {
-                        Text(movie.title)
-                    }
-                }
+                                    NavigationLink(destination: MovieDetailView(movie: movie)) {
+                                        Text(movie.title)
+                                    }
+                                }
             }
             .onAppear {
                 fetchMovies()

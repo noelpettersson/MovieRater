@@ -12,13 +12,14 @@ struct MovieResponse: Decodable {
     let results: [Movie]
 }
 
-
 struct Movie: Codable, Identifiable {
     let id: Int
     let title: String
     let backdrop_path: String?
     let poster_path: String?
     let overview: String
+    let vote_average: Double
+    let vote_count: Int
     let runtime: Int?
     let release_date: String?
     let genre: String?
@@ -26,6 +27,6 @@ struct Movie: Codable, Identifiable {
     
     
     enum CodingKeys: String, CodingKey {
-        case id, title, backdrop_path, poster_path, overview, runtime, release_date, genre, origin_country
+        case id, title, backdrop_path, poster_path, overview, vote_average, vote_count, runtime, release_date, genre, origin_country
     }
 }
