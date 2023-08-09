@@ -12,7 +12,27 @@ struct ContentView: View {
     var body: some View {
         Group {
             if viewModel.userSession != nil {
-                MainView()
+                TabView {
+                    MainView()
+                        .tabItem() {
+                            Image(systemName: "person")
+                            Text("Profile")
+                        }
+                    
+                    MovieTopRatedView()
+                        .tabItem() {
+                            Image(systemName: "film")
+                            Text("Main")
+                        }
+                    
+                    MovieSearchView()
+                        .tabItem() {
+                            Image(systemName: "magnifyingglass")
+                            Text("Search")
+                        }
+                    
+                    
+                }
             } else {
                 RegisterView()
             }
