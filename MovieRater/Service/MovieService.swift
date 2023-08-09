@@ -67,9 +67,4 @@ class MovieService {
             }
         }.resume()
     }
-    
-    func fetchMovie() {
-        // You can implement fetching specific movie details using the movie ID here
-    }
-
 }
