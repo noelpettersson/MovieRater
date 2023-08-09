@@ -7,12 +7,34 @@
 
 import SwiftUI
 
+import SwiftUI
+
 struct MovieSearchView: View {
+    @State private var query: String = ""
+    @State private var showMovies: Bool = false
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        NavigationView {
+            VStack {
+                TextField("Enter movie title", text: $query)
+                    .padding()
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                
+                Button("Search") {
+                    showMovies = true
+                }
+                
+                if showMovies {
+                    NavigationLink(destination: MovieSearchList(query: query), isActive: $showMovies) {
+                        EmptyView()
+                    }
+                    .hidden()
+                }
+            }
+            .padding()
+        }
     }
 }
-
 struct MovieSearchView_Previews: PreviewProvider {
     static var previews: some View {
         MovieSearchView()
