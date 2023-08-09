@@ -10,6 +10,10 @@ import Foundation
 struct MovieResponse: Decodable {
     
     let results: [Movie]
+    
+    func findMovieByID(id: Int) -> Movie? {
+        return results.first { $0.id == id }
+    }
 }
 
 struct Movie: Codable, Identifiable {

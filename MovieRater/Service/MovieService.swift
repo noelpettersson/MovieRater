@@ -49,6 +49,24 @@ class MovieService {
         task.resume()
     }
     
+    func fetchMovieDetailsByID(id: Int, completion: @escaping (Result<Movie, Error>) -> Void) {
+        guard let url = URL(string: "https://api.themoviedb.org/3/movie/\(id)?api_key=\(apiKey)") else {
+            return
+        }
+
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let data = data {
+                do {
+                    let movie = try JSONDecoder().decode(Movie.self, from: data)
+                    completion(.success(movie))
+                } catch {
+                    completion(.failure(error))
+                }
+            } else if let error = error {
+                completion(.failure(error))
+            }
+        }.resume()
+    }
     
     func fetchMovie() {
         // You can implement fetching specific movie details using the movie ID here

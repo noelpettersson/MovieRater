@@ -9,16 +9,10 @@ import SwiftUI
 
 struct MovieSearchList: View {
     @State private var movies: [Movie] = []
-       @State private var selectedMovieID: Int?
-       let query: String
-       
-       init(query: String) {
-           self.query = query
-       }
        
        var body: some View {
            VStack {
-               Text("Top Rated Movies for '\(query)'")
+               Text("Top Rated Movies for")
                List(movies) { movie in
                    NavigationLink(destination: MovieDetailView(movie: movie)) {
                        Text(movie.title)

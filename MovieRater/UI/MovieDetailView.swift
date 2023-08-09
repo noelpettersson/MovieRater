@@ -6,10 +6,13 @@
 //
 
 import SwiftUI
+import Firebase
 
 
 struct MovieDetailView: View {
     let movie: Movie
+    @State private var hasUserVoted: Bool = false
+    @State private var voteCount: Int = 0
     
     var body: some View {
         ScrollView {
@@ -58,26 +61,6 @@ struct MovieDetailView: View {
                         .foregroundColor(.gray)
                 }
                 
-                HStack {
-                    Image(systemName: "tag")
-                        .foregroundColor(.gray)
-                    Text("Genre: \(movie.genre ?? "")")
-                        .foregroundColor(.gray)
-                }
-                
-                HStack {
-                    Image(systemName: "globe")
-                        .foregroundColor(.gray)
-                    Text("Origin Country: \(movie.origin_country ?? "")")
-                        .foregroundColor(.gray)
-                }
-                
-                HStack {
-                    Image(systemName: "clock")
-                        .foregroundColor(.gray)
-                    Text("Runtime: \(movie.runtime ?? 0) minutes")
-                        .foregroundColor(.gray)
-                }
                 
                 Text("Overview")
                     .font(.headline)
@@ -87,29 +70,82 @@ struct MovieDetailView: View {
                     .foregroundColor(.secondary)
                     .lineLimit(nil)
                 
-                Spacer()
+                HStack {
+                    Image(systemName: "hand.thumbsup.fill")
+                            .foregroundColor(.green)
+                        Text("Vote Count: \(voteCount)")
+                            .foregroundColor(.green)
+                    }
+                               
+                    Button(action: {
+                        voteForMovie()
+                    }) {
+                    Text(hasUserVoted ? "Voted" : "Vote")
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(hasUserVoted ? Color.gray : Color.blue)
+                        .cornerRadius(10)
+                    }
+                        .disabled(hasUserVoted)
+                        .padding()
+                    }
+                    .onAppear {
+                    checkUserVote()
+                    fetchVoteCount() // Fetch vote count on appearance
+                    }
+                    .padding()
+                    }
+                }
+    
+    func fetchVoteCount() {
+           // Fetch the vote count from Firestore
+           let db = Firestore.firestore()
+           let movieDocRef = db.collection("movie_ratings").document(String(movie.id))
+           
+           movieDocRef.getDocument { document, error in
+               if let document = document, let data = document.data(), let votedUsers = data["votedUsers"] as? [String] {
+                   self.voteCount = votedUsers.count
+               }
+           }
+       }
+    
+    func checkUserVote() {
+        guard let userID = Auth.auth().currentUser?.uid else {
+            return
+        }
+
+        // Query Firestore to check if the user has voted for this movie
+        let db = Firestore.firestore()
+        db.collection("movie_ratings").document(String(movie.id)).getDocument { document, error in
+            if let document = document, document.exists {
+                if let votedUsers = document.data()?["votedUsers"] as? [String] {
+                    self.hasUserVoted = votedUsers.contains(userID)
+                }
             }
-            .padding()
         }
     }
-}
 
-struct MovieDetailView_Previews: PreviewProvider {
-    static var previews: some View {
-        let mockMovie = Movie(
-            id: 123,
-            title: "Shrek",
-            backdrop_path: "backdrop_path",
-            poster_path: "poster_path",
-            overview: "Overview of the movie",
-            vote_average: 7.5,
-            vote_count: 1000,
-            runtime: 120,
-            release_date: "2023-08-09",
-            genre: "Animation, Comedy",
-            origin_country: "USA"
-        )
-        
-        return MovieDetailView(movie: mockMovie)
+    func voteForMovie() {
+        guard !hasUserVoted else {
+            print("User has already voted for this movie")
+            return
+        }
+
+        guard let userID = Auth.auth().currentUser?.uid else {
+            return
+        }
+
+        // Update Firestore to record the user's vote
+        let db = Firestore.firestore()
+        let movieDocRef = db.collection("movie_ratings").document(String(movie.id))
+
+        movieDocRef.setData(["votedUsers": FieldValue.arrayUnion([userID])], merge: true) { error in
+            if let error = error {
+                print("Error voting: \(error)")
+            } else {
+                print("User voted successfully")
+                self.hasUserVoted = true
+            }
+        }
     }
 }
